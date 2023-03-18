@@ -1,4 +1,4 @@
-// 메뉴버튼
+// 메뉴버튼 ///////////////////////////////////////////////
 const menuBtn = document.querySelector(".header-menu-icon");
 const header = document.querySelector(".header-wrapper");
 const lnb = document.querySelector(".lnb");
@@ -10,7 +10,7 @@ menuBtn.addEventListener("click", function() {
 });
 
 
-// 슬라이더
+// 슬라이더 ///////////////////////////////////////////////
 
 const slideItems = document.querySelectorAll(".slide-item");
 const slideContainer = document.querySelector(".slide-container");
@@ -28,10 +28,13 @@ for (const item of slideItems){
   item.style.transition = `opacity ${transitionDuration}ms`;
 }
 
-// 이미지 인덱스 초기화
+// 현재 이미지 인덱스 초기화
 let currentSlideIndex = 0;
 
 // next 이미지 전환 함수
+// 1->2: 0(none) 1(auto) 1(auto)
+// 2->3: 0(none) 0(none) 1(auto)
+// 3->1: 1(auto) 1(auto) 1(auto)
 function nextSlide() {
   if(currentSlideIndex < (slideItems.length - 1)){
     slideItems[currentSlideIndex].style.opacity = 0;
@@ -44,15 +47,19 @@ function nextSlide() {
       item.style.pointerEvents = "auto";
     }
   }
+  // 나머지연산자를 사용해 현재 인덱스 업데이트
   currentSlideIndex = (currentSlideIndex + 1) % slideItems.length;
 }
 
 // prev 이미지 전환 함수
+// 1->3: 0(none) 0(none) 1(auto)
+// 3->2: 0(none) 1(auto) 1(auto)
+// 2->1: 1(auto) 1(auto) 1(auto)
 function prevSlide() {
   if(currentSlideIndex > 0){
     slideItems[currentSlideIndex-1].style.opacity = 1;
     slideItems[currentSlideIndex-1].style.pointerEvents = "auto";
-    currentSlideIndex = (currentSlideIndex - 1) % slideItems.length;
+    currentSlideIndex = currentSlideIndex - 1
   }
   // 첫번째 이미지인 경우, 마지막 이미지로 전환
   else {
@@ -111,38 +118,36 @@ slideContainer.addEventListener("mousemove", function(e){
 });
 
 
-
+// 투명도 0.5 보다 작은 경우, 다음/이전 슬라이드 보여주기
+// 투명도 0.5 보다 큰 경우, 기존 이미지 보여주기
 slideContainer.addEventListener("mouseup", function(e) {
   endPoint = e.clientX;
   isdragging = false;
 
-    if(endPoint < startPoint) {
-      if(slideOpacity < 0.5 ){
-        nextSlide();
-      } else {
-        if(currentSlideIndex < slideItems.length - 1) {
-          e.target.parentElement.style.opacity = 1;
-        } else {
-          slideItems[0].style.opacity = 0;
-        }
+  // next
+  if(endPoint < startPoint) {
+    if(slideOpacity < 0.5 ){
+      nextSlide();
+    } else { 
+      if(currentSlideIndex < slideItems.length - 1) {
+        e.target.parentElement.style.opacity = 1;
+      } else { // 마지막 이미지인 경우
+        slideItems[0].style.opacity = 0;
       }
     }
-    else if(endPoint > startPoint) {
-      if(slideOpacity < 0.5 ){
-        prevSlide();
-      } else {
-        if(currentSlideIndex > 0) {
-          slideItems[currentSlideIndex].style.opacity = 1;
-          slideItems[currentSlideIndex-1].style.opacity = 0;
-        } else {
-          for (const item of slideItems){item.style.opacity = 1;}
-        }
+  } // prev
+  else if(endPoint > startPoint) {
+    if(slideOpacity < 0.5 ){
+      prevSlide();
+    } else {
+      if(currentSlideIndex > 0) {
+        slideItems[currentSlideIndex].style.opacity = 1;
+        slideItems[currentSlideIndex-1].style.opacity = 0;
+      } else { // 첫번째 이미지인 경우
+        for (const item of slideItems){item.style.opacity = 1;}
       }
     }
-    // 1->3: 0(none) 0(none) 1(auto)
-    // 3->2: 0(none) 1(auto) 1(auto)
-    // 2->1: 1(auto) 1(auto) 1(auto)
-
+  }
 });
 
 
